@@ -8,7 +8,6 @@ Este repositorio contiene la solución completa, rigurosa y reproducible para el
 
 - **`Taller_Agentes_Inteligentes.ipynb`**: Notebook de Jupyter con todas las demostraciones teóricas en LaTeX, código Python de simulación (Agente Reflexivo Simple vs. Agente con Estado), análisis de métricas Monte Carlo y modelo epidemiológico SIR con el framework **Mesa**.
 - **`solucion_taller.py`**: Motor de simulación en Python (POO + Mesa) para ejecutar las corridas experimentales y generar los gráficos de rendimiento.
-- **`agentes-inteligentes-master-framework.md`**: Marco de Ingeniería Master que define las 27 disciplinas de Ciencia de la Computación aplicadas a este taller.
 - **`images/`**: Gráficos e histogramas explicativos generados durante la experimentación.
 
 ---
@@ -43,4 +42,4 @@ Este repositorio contiene la solución completa, rigurosa y reproducible para el
 6. **Sistemas Multiagente (Mesa)**: Modelo SIR de propagación de infección y evaluación cuantitativa de 2 estrategias de mitigación (Aislamiento social y Mascarillas/Vacunación).
 
 ---
-*Desarrollado bajo el Marco de Ingeniería de Software Master - Curso IA 2026.*
+*Curso de Inteligencia Artificial 2026.*
