@@ -296,23 +296,25 @@ class StatefulVacuumAgent(BaseAgent):
 
 
 # ==========================================
-# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB
+# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB (3 SEGUNDOS POR SIMULACIÓN)
 # ==========================================
 
-def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=20, delay=0.5, seed=42):
+def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=15, duracion_total_segundos=3.0, seed=42):
     """
-    Renderiza el tablero HTML dinámico en Jupyter utilizando widgets.HTML
-    con emoticons 🤖 para el agente y 🍂 para las hojas.
+    Renderiza la animación del agente en el Tablero HTML dinámico.
+    La simulación completa se calibra para durar exactamente duracion_total_segundos (default: 3 segundos).
     """
     env = Environment(n_grid, m_grid, prob_hojas=0.5, seed=seed)
     agente = TipoAgente(pos_inicial=(0, 0), energia=energia, orientacion_deg=0)
     tablero = Tablero(tamano_celda=(50, 50), n_celdas=(n_grid, m_grid))
 
+    # Calcular delay por paso para que la simulación completa dure exactamente 3 segundos
+    max_pasos = min(energia, 25)
+    delay_por_paso = max(duracion_total_segundos / max_pasos, 0.05)
+
     def construir_objetos_visuales():
         objs = []
-        # Agente 🤖
         objs.append(ObjetoVisual(x=agente.pos[0], y=agente.pos[1], angulo=agente.orientacion.value[2], emoticon="🤖", tamano_emoticon=28))
-        # Hojas 🍂
         for i in range(env.n):
             for j in range(env.m):
                 if env.grid[i, j] == 1:
@@ -320,18 +322,18 @@ def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=20, de
         return objs
 
     tablero.dibujar(construir_objetos_visuales())
-    time.sleep(delay)
+    time.sleep(delay_por_paso)
 
     pasos = 0
-    while agente.energia > 0 and env.hojas_restantes() > 0 and pasos < 50:
+    while agente.energia > 0 and env.hojas_restantes() > 0 and pasos < max_pasos:
         actuado = agente.actuar(env)
         tablero.dibujar(construir_objetos_visuales())
-        time.sleep(delay)
+        time.sleep(delay_por_paso)
         if not actuado:
             break
         pasos += 1
 
-    print(f"Simulación finalizada. Energía restante: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
+    print(f"Simulación completada en {duracion_total_segundos}s. Energía final: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
 
 
 # ==========================================

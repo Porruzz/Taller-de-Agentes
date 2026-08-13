@@ -119,7 +119,7 @@ $$U_T(A^*) = -k \\cdot c + (T - k + 1) \\cdot R \\quad \\text{para } T \\ge k$$
 
 Sin embargo, si el horizonte disponible es **insuficiente** ($T < k$), el agente consume $-T \\cdot c$ en trasladarse sin llegar a obtener la recompensa $+R$, resultando en una utilidad nula o negativa. En consecuencia, para $T < k$, la acción racional cambia a una estrategia conservadora (ej. `NoOp` o recarga inmediata). 
 
-Por lo tanto, **la racionalidad no depende únicamente del estado actual del ambiente, sino strictly del tiempo disponible $T$ para actuar.**
+Por lo tanto, **la racionalidad no depende únicamente del estado actual del ambiente, sino estrictamente del tiempo disponible $T$ para actuar.**
 
 ---
 
@@ -150,7 +150,7 @@ Por lo tanto, **la racionalidad no depende únicamente del estado actual del amb
     # ==========================================
     add_md("""## 4. Punto 3 – Implementación del Agente Reflexivo Simple (Robot Aspiradora)
 
-A continuación se presenta la implementación del ambiente en grilla $N \\times M$ y la **visualización interactiva HTML con widgets (`Tablero`)**, donde el robot 🤖 se desplaza, gira y aspira hojas 🍂 en tiempo real.""")
+A continuación se presenta la implementación del ambiente en grilla $N \\times M$ y la **visualización interactiva HTML con widgets (`Tablero`)**, configurada para que la simulación completa dure exactamente **3 segundos**.""")
 
     add_code("""from IPython.display import display
 import ipywidgets as widgets
@@ -164,9 +164,9 @@ from solucion_taller import (
     animar_simulacion_interactiva, ejecutar_experimentos
 )
 
-print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE REFLEXIVO SIMPLE ---")
-# Ejecución interactiva con renderizado dinámico HTML (Tablero, 🤖 y 🍂)
-animar_simulacion_interactiva(ReflexiveVacuumAgent, n_grid=5, m_grid=5, energia=15, delay=0.3, seed=42)
+print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE REFLEXIVO SIMPLE (DURACIÓN: 3 SEGUNDOS) ---")
+# Animación interactiva configurada para durar exactamente 3.0 segundos
+animar_simulacion_interactiva(ReflexiveVacuumAgent, n_grid=5, m_grid=5, energia=15, duracion_total_segundos=3.0, seed=42)
 """)
 
     add_code("""# Ejecutar batería de 50 simulaciones Monte Carlo para el Agente Reflexivo Simple
@@ -196,10 +196,10 @@ display(summary_ref)
     # ==========================================
     add_md("""## 5. Punto 4 – Implementación del Agente con Estado Interno
 
-El **Agente con Estado Interno** mantiene memoria activa de casillas visitadas, exploradas y ubicación de hojas detectadas, visualizándose dinámicamente en el `Tablero` HTML.""")
+El **Agente con Estado Interno** mantiene memoria activa de casillas visitadas, exploradas y ubicación de hojas detectadas, visualizándose dinámicamente en el `Tablero` HTML durante **3 segundos**.""")
 
-    add_code("""print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE CON ESTADO INTERNO ---")
-animar_simulacion_interactiva(StatefulVacuumAgent, n_grid=5, m_grid=5, energia=15, delay=0.3, seed=42)
+    add_code("""print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE CON ESTADO INTERNO (DURACIÓN: 3 SEGUNDOS) ---")
+animar_simulacion_interactiva(StatefulVacuumAgent, n_grid=5, m_grid=5, energia=15, duracion_total_segundos=3.0, seed=42)
 """)
 
     add_code("""print("--- RESULTADOS MONTE CARLO: AGENTE CON ESTADO INTERNO (50 CORRIDAS) ---")
@@ -357,7 +357,7 @@ plt.show()
     with open("Taller_Agentes_Inteligentes.ipynb", "w", encoding="utf-8") as f:
         json.dump(nb_data, f, indent=2, ensure_ascii=False)
     
-    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente.")
+    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente (3 segundos por simulacion).")
 
 if __name__ == "__main__":
     build_notebook()
