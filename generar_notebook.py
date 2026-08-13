@@ -164,9 +164,9 @@ from solucion_taller import (
     animar_simulacion_interactiva, ejecutar_experimentos
 )
 
-print("--- DEMOSTRACIÓN VISUAL INTERACTIVA COMPLETA: AGENTE REFLEXIVO SIMPLE (DURACIÓN: 20 SEGUNDOS) ---")
-# Animación interactiva configurada para ejecutar los 40 pasos en exactamente 20.0 segundos
-animar_simulacion_interactiva(ReflexiveVacuumAgent, n_grid=5, m_grid=5, energia=40, duracion_total_segundos=20.0, seed=42)
+print("--- DEMOSTRACIÓN VISUAL INTERACTIVA COMPLETA: AGENTE REFLEXIVO SIMPLE (40 PASOS, DELAY=0.5s -> 20s TOTAL) ---")
+# Ejecución visual extendida: 40 unidades de energía con 0.5s de delay por paso (Total ~20 segundos de animación)
+animar_simulacion_interactiva(ReflexiveVacuumAgent, n_grid=5, m_grid=5, energia=40, delay=0.5, seed=42)
 """)
 
     add_code("""# Ejecutar batería de 50 simulaciones Monte Carlo para el Agente Reflexivo Simple
@@ -198,8 +198,9 @@ display(summary_ref)
 
 A continuación se presenta la **visualización interactiva completa (20 segundos)** del Agente con Estado Interno navegando hacia las hojas conocidas en el `Tablero` HTML.""")
 
-    add_code("""print("--- DEMOSTRACIÓN VISUAL INTERACTIVA COMPLETA: AGENTE CON ESTADO INTERNO (DURACIÓN: 20 SEGUNDOS) ---")
-animar_simulacion_interactiva(StatefulVacuumAgent, n_grid=5, m_grid=5, energia=40, duracion_total_segundos=20.0, seed=42)
+    add_code("""print("--- DEMOSTRACIÓN VISUAL INTERACTIVA COMPLETA: AGENTE CON ESTADO INTERNO (40 PASOS, DELAY=0.5s -> 20s TOTAL) ---")
+# Ejecución visual extendida: 40 unidades de energía con 0.5s de delay por paso (Total ~20 segundos de animación)
+animar_simulacion_interactiva(StatefulVacuumAgent, n_grid=5, m_grid=5, energia=40, delay=0.5, seed=42)
 """)
 
     add_code("""print("--- RESULTADOS MONTE CARLO: AGENTE CON ESTADO INTERNO (50 CORRIDAS) ---")
@@ -357,7 +358,7 @@ plt.show()
     with open("Taller_Agentes_Inteligentes.ipynb", "w", encoding="utf-8") as f:
         json.dump(nb_data, f, indent=2, ensure_ascii=False)
     
-    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente (20 segundos por simulacion).")
+    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente con energia=40 y delay=0.5 (20 segundos por ejecucion).")
 
 if __name__ == "__main__":
     build_notebook()

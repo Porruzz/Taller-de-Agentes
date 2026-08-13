@@ -296,20 +296,17 @@ class StatefulVacuumAgent(BaseAgent):
 
 
 # ==========================================
-# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB (20 SEGUNDOS COMPLETO)
+# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB (ENERGÍA=40, DELAY=0.5 -> 20 SEGUNDOS)
 # ==========================================
 
-def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=40, duracion_total_segundos=20.0, seed=42):
+def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=40, delay=0.5, seed=42):
     """
     Renderiza la animación del agente en el Tablero HTML dinámico.
-    Muestra la ejecución COMPLETA de todas las unidades de energía durante exactamente duracion_total_segundos (default: 20 segundos).
+    Por defecto ejecuta energia=40 pasos con delay=0.5s por paso para una duración total de ~20 segundos.
     """
     env = Environment(n_grid, m_grid, prob_hojas=0.5, seed=seed)
     agente = TipoAgente(pos_inicial=(0, 0), energia=energia, orientacion_deg=0)
     tablero = Tablero(tamano_celda=(50, 50), n_celdas=(n_grid, m_grid))
-
-    max_pasos = energia
-    delay_por_paso = duracion_total_segundos / max_pasos  # e.g., 20.0 / 40 = 0.5s por paso
 
     def construir_objetos_visuales():
         objs = []
@@ -321,18 +318,18 @@ def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=40, du
         return objs
 
     tablero.dibujar(construir_objetos_visuales())
-    time.sleep(delay_por_paso)
+    time.sleep(delay)
 
     pasos = 0
-    while agente.energia > 0 and env.hojas_restantes() > 0 and pasos < max_pasos:
+    while agente.energia > 0 and env.hojas_restantes() > 0 and pasos < energia:
         actuado = agente.actuar(env)
         tablero.dibujar(construir_objetos_visuales())
-        time.sleep(delay_por_paso)
+        time.sleep(delay)
         if not actuado:
             break
         pasos += 1
 
-    print(f"Simulación completa finalizada ({duracion_total_segundos}s). Pasos ejecutados: {pasos}, Energía restante: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
+    print(f"Simulación completa finalizada ({pasos * delay:.1f}s). Pasos ejecutados: {pasos}, Energía restante: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
 
 
 # ==========================================
