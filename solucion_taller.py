@@ -296,21 +296,20 @@ class StatefulVacuumAgent(BaseAgent):
 
 
 # ==========================================
-# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB (3 SEGUNDOS POR SIMULACIÓN)
+# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB (20 SEGUNDOS COMPLETO)
 # ==========================================
 
-def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=15, duracion_total_segundos=3.0, seed=42):
+def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=40, duracion_total_segundos=20.0, seed=42):
     """
     Renderiza la animación del agente en el Tablero HTML dinámico.
-    La simulación completa se calibra para durar exactamente duracion_total_segundos (default: 3 segundos).
+    Muestra la ejecución COMPLETA de todas las unidades de energía durante exactamente duracion_total_segundos (default: 20 segundos).
     """
     env = Environment(n_grid, m_grid, prob_hojas=0.5, seed=seed)
     agente = TipoAgente(pos_inicial=(0, 0), energia=energia, orientacion_deg=0)
     tablero = Tablero(tamano_celda=(50, 50), n_celdas=(n_grid, m_grid))
 
-    # Calcular delay por paso para que la simulación completa dure exactamente 3 segundos
-    max_pasos = min(energia, 25)
-    delay_por_paso = max(duracion_total_segundos / max_pasos, 0.05)
+    max_pasos = energia
+    delay_por_paso = duracion_total_segundos / max_pasos  # e.g., 20.0 / 40 = 0.5s por paso
 
     def construir_objetos_visuales():
         objs = []
@@ -333,7 +332,7 @@ def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=15, du
             break
         pasos += 1
 
-    print(f"Simulación completada en {duracion_total_segundos}s. Energía final: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
+    print(f"Simulación completa finalizada ({duracion_total_segundos}s). Pasos ejecutados: {pasos}, Energía restante: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
 
 
 # ==========================================
