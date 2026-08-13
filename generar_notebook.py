@@ -42,7 +42,13 @@ def build_notebook():
     # ==========================================
     add_md("""## 2. Punto 1 – Racionalidad del Agente Aspiradora
 
-### 2.1 Análisis de Racionalidad (Escenario Russell & Norvig Fig. 2.2)
+### 2.1 Análisis de Racionalidad (Escenario Russell & Norvig Fig. 2.1, 2.2 y 2.3)
+
+![Agentes y Entornos - Figura 2.1](images/figure_2_1_agent_environment.png)
+*Figura 2.1: Los agentes interactúan con los entornos a través de sensores (sensores/percepciones) y actuadores (acciones).*
+
+![Mundo Aspiradora - Figuras 2.2 y 2.3](images/figure_2_2_and_2_3_vacuum_world.png)
+*Figura 2.2 y 2.3: Mundo de la aspiradora de dos ubicaciones (A y B) y tabulación parcial de la función de agente.*
 
 #### Marco Conceptual PEAS (Performance, Environment, Actuators, Sensors)
 * **Medida de Desempeño ($P$):** $+1$ punto por cada casilla limpia en cada unidad de tiempo $t$.
@@ -53,17 +59,17 @@ def build_notebook():
 #### Demostración Formal de Racionalidad
 Un agente se define como **racional** si, para cada posible secuencia de percepciones, selecciona la acción que maximiza el valor esperado de la medida de desempeño, dado el conocimiento previo incorporado y la información provista por las percepciones recibidas hasta ese momento.
 
-Consideremos la función de agente descrita en el texto base:
+Consideremos la función de agente descrita en la Figura 2.3 del texto guía:
 $$\\begin{aligned}
-[A, \\text{Sucio}] &\\to \\text{Aspirar} \\\\
-[A, \\text{Limpio}] &\\to \\text{Derecha} \\\\
-[B, \\text{Sucio}] &\\to \\text{Aspirar} \\\\
-[B, \\text{Limpio}] &\\to \\text{Izquierda}
+[A, \\text{Clean}] &\\to \\text{Right} \\\\
+[A, \\text{Dirty}] &\\to \\text{Suck} \\\\
+[B, \\text{Clean}] &\\to \\text{Left} \\\\
+[B, \\text{Dirty}] &\\to \\text{Suck}
 \\end{aligned}$$
 
-1. **Estado $[A, \\text{Sucio}]$:** Ejecutar $\\text{Aspirar}$ transforma la casilla a limpia, otorgando $+1$ en el siguiente paso. Cualquier otra acción (ej. moverse a $B$) deja la casilla $A$ sucia, obteniendo $0$ puntos inmediatos. Por lo tanto, $\\text{Aspirar}$ es la única acción que maximiza la utilidad esperada.
-2. **Estado $[A, \\text{Limpio}]$:** Ya que $A$ está limpia, permanecer en $A$ asegura $0$ ganancia marginal. Trasladarse a $B$ mediante $\\text{Derecha}$ permite al agente acceder a $B$. Si $B$ estaba sucio, podrá aspirarse en el paso siguiente (obteniendo beneficio futuro). Por lo tanto, la acción con mayor utilidad esperada es $\\text{Derecha}$.
-3. **Simetría para $B$:** Aplica la misma deducción lógica.
+1. **Estado $[A, \\text{Dirty}]$:** Ejecutar $\\text{Suck}$ transforma la casilla a limpia, otorgando $+1$ en el siguiente paso. Cualquier otra acción (ej. moverse a $B$) deja la casilla $A$ sucia, obteniendo $0$ puntos inmediatos. Por lo tanto, $\\text{Suck}$ es la única acción que maximiza la utilidad esperada.
+2. **Estado $[A, \\text{Clean}]$:** Ya que $A$ está limpia, permanecer en $A$ asegura $0$ ganancia marginal. Trasladarse a $B$ mediante $\\text{Right}$ permite al agente acceder a $B$. Si $B$ estaba sucio, podrá aspirarse en el paso siguiente (obteniendo beneficio futuro). Por lo tanto, la acción con mayor utilidad esperada es $\\text{Right}$.
+3. **Simetría para $B$:** Aplica la misma deducción lógica para $[B, \\text{Dirty}]$ y $[B, \\text{Clean}]$.
 
 **Conclusión:** Dado que la función de agente asigna en cada estado perceptivo la acción que maximiza de manera óptima el valor esperado de la medida de desempeño $P$, **su comportamiento es estrictamente racional**.
 
@@ -72,22 +78,22 @@ $$\\begin{aligned}
 ### 2.2 Diseño de Nueva Función de Agente con Penalización por Movimiento ($-1$)
 
 #### Nueva Medida de Desempeño
-$$U = \\sum_{t=1}^{T} \\left( C_{\\text{limpio}} \\cdot \\mathbb{I}(\\text{casilla } t \\text{ limpia}) - 1 \\cdot \\mathbb{I}(\\text{accion } t \\in \\{\\text{Izquierda, Derecha}\\}) \\right)$$
+$$U = \\sum_{t=1}^{T} \\left( C_{\\text{limpio}} \\cdot \\mathbb{I}(\\text{casilla } t \\text{ limpia}) - 1 \\cdot \\mathbb{I}(\\text{accion } t \\in \\{\\text{Left, Right}\\}) \\right)$$
 
 Donde cada movimiento realizado descuenta una unidad ($-1$) de la puntuación acumulada.
 
 #### Rediseño de la Función de Agente Racional
-Bajo esta nueva métrica, oscilar indefinidamente entre $A$ y $B$ destruye el desempeño del agente. La acción racional óptima requiere detenerse (`NoOp`) una vez que ambas casillas están verificadas/limpias.
+Bajo esta nueva métrica, oscilar infinitamente entre $A$ y $B$ destruye el desempeño del agente. La acción racional óptima requiere detenerse (`NoOp`) una vez que ambas casillas están verificadas/limpias.
 
 $$\\begin{aligned}
-[A, \\text{Sucio}] &\\to \\text{Aspirar} \\\\
-[B, \\text{Sucio}] &\\to \\text{Aspirar} \\\\
-[A, \\text{Limpio}] &\\to \\begin{cases} 
-\\text{Derecha} & \\text{si } B \\text{ no ha sido visitado aún} \\\\
+[A, \\text{Dirty}] &\\to \\text{Suck} \\\\
+[B, \\text{Dirty}] &\\to \\text{Suck} \\\\
+[A, \\text{Clean}] &\\to \\begin{cases} 
+\\text{Right} & \\text{si } B \\text{ no ha sido visitado aún} \\\\
 \\text{NoOp} & \\text{si } B \\text{ ya fue visitado/verificado}
 \\end{cases} \\\\
-[B, \\text{Limpio}] &\\to \\begin{cases} 
-\\text{Izquierda} & \\text{si } A \\text{ no ha sido visitado aún} \\\\
+[B, \\text{Clean}] &\\to \\begin{cases} 
+\\text{Left} & \\text{si } A \\text{ no ha sido visitado aún} \\\\
 \\text{NoOp} & \\text{si } A \\text{ ya fue visitado/verificado}
 \\end{cases}
 \\end{aligned}$$
@@ -100,8 +106,8 @@ $$\\begin{aligned}
 
 #### Justificación
 Un agente reflexivo simple **carece de memoria histórica** de sus percepciones pasadas; solo responde a la percepción actual $[\\text{Ubicacion}, \\text{Estado}]$. 
-- Si el agente se encuentra en $[A, \\text{Limpio}]$, sin estado interno no puede determinar si *recién inicia la simulación y $B$ falta por revisar*, o si *ya revisó y limpió $B$ previamente*.
-- Si la regla estática es responder con $\\text{Derecha}$, al llegar a $[B, \\text{Limpio}]$ responderá con $\\text{Izquierda}$, cayendo en un **bucle infinito de movimiento** $A \\leftrightarrow B$, acumulando una penalización energética de $-1$ por cada paso sin obtener recompensas adicionales.
+- Si el agente se encuentra en $[A, \\text{Clean}]$, sin estado interno no puede determinar si *recién inicia la simulación y $B$ falta por revisar*, o si *ya revisó y limpió $B$ previamente*.
+- Si la regla estática es responder con $\\text{Right}$, al llegar a $[B, \\text{Clean}]$ responderá con $\\text{Left}$, cayendo en un **bucle infinito de movimiento** $A \\leftrightarrow B$, acumulando una penalización energética de $-1$ por cada paso sin obtener recompensas adicionales.
 
 Con un **estado interno** (manteniendo variables booleanas $\\text{visitado\\_A}$ y $\\text{visitado\\_B}$), el agente sabe cuándo ambas casillas han sido procesadas y puede seleccionar la acción `NoOp` para preservar su puntaje total. Por lo tanto, **el estado interno es indispensable para la racionalidad bajo costo de movimiento**.""")
 
@@ -358,7 +364,7 @@ plt.show()
     with open("Taller_Agentes_Inteligentes.ipynb", "w", encoding="utf-8") as f:
         json.dump(nb_data, f, indent=2, ensure_ascii=False)
     
-    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente con energia=40 y delay=0.5 (20 segundos por ejecucion).")
+    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente con imagenes de Russell & Norvig.")
 
 if __name__ == "__main__":
     build_notebook()

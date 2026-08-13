@@ -6,9 +6,19 @@ Este repositorio contiene la solución completa, rigurosa y reproducible para el
 
 ## 📌 Estructura del Repositorio
 
-- **`Taller_Agentes_Inteligentes.ipynb`**: Notebook de Jupyter con todas las demostraciones teóricas en LaTeX, código Python de simulación (Agente Reflexivo Simple vs. Agente con Estado), análisis de métricas Monte Carlo y modelo epidemiológico SIR con el framework **Mesa**.
+- **`Taller_Agentes_Inteligentes.ipynb`**: Notebook de Jupyter con todas las demostraciones teóricas en LaTeX, diagramas oficiales de Russell & Norvig (Figuras 2.1, 2.2 y 2.3), código Python de simulación (Agente Reflexivo Simple vs. Agente con Estado), análisis de métricas Monte Carlo y modelo epidemiológico SIR con el framework **Mesa**.
 - **`solucion_taller.py`**: Motor de simulación en Python (POO + Mesa) para ejecutar las corridas experimentales y generar los gráficos de rendimiento.
-- **`images/`**: Gráficos e histogramas explicativos generados durante la experimentación.
+- **`images/`**: Gráficos e diagramas oficiales del libro (Agentes, Entornos y Mundo Aspiradora) e histogramas experimentales.
+
+---
+
+## 📘 Diagramas Oficiales de Referencia (Russell & Norvig)
+
+### Figura 2.1: Agentes y Entornos
+![Agentes y Entornos](images/figure_2_1_agent_environment.png)
+
+### Figuras 2.2 y 2.3: Mundo de la Aspiradora y Función del Agente
+![Mundo Aspiradora](images/figure_2_2_and_2_3_vacuum_world.png)
 
 ---
 
