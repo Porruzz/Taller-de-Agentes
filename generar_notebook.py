@@ -119,7 +119,7 @@ $$U_T(A^*) = -k \\cdot c + (T - k + 1) \\cdot R \\quad \\text{para } T \\ge k$$
 
 Sin embargo, si el horizonte disponible es **insuficiente** ($T < k$), el agente consume $-T \\cdot c$ en trasladarse sin llegar a obtener la recompensa $+R$, resultando en una utilidad nula o negativa. En consecuencia, para $T < k$, la acción racional cambia a una estrategia conservadora (ej. `NoOp` o recarga inmediata). 
 
-Por lo tanto, **la racionalidad no depende únicamente del estado actual del ambiente, sino estrictamente del tiempo disponible $T$ para actuar.**
+Por lo tanto, **la racionalidad no depende únicamente del estado actual del ambiente, sino strictly del tiempo disponible $T$ para actuar.**
 
 ---
 
@@ -150,23 +150,26 @@ Por lo tanto, **la racionalidad no depende únicamente del estado actual del amb
     # ==========================================
     add_md("""## 4. Punto 3 – Implementación del Agente Reflexivo Simple (Robot Aspiradora)
 
-A continuación se presenta la implementación orientada a objetos en Python para el ambiente en grilla $N \\times M$ y el Agente Reflexivo Simple, con sensado de costo energético y conjunto de reglas condición-acción.""")
+A continuación se presenta la implementación del ambiente en grilla $N \\times M$ y la **visualización interactiva HTML con widgets (`Tablero`)**, donde el robot 🤖 se desplaza, gira y aspira hojas 🍂 en tiempo real.""")
 
-    add_code("""import random
-import numpy as np
+    add_code("""from IPython.display import display
+import ipywidgets as widgets
+import time
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from enum import Enum
-from typing import Tuple, List, Dict, Set, Optional
 
-sns.set_theme(style="darkgrid")
-plt.rcParams['font.size'] = 11
+# Importación de clases de simulación y visualización (Guía Notebook Robot_Aspiradora_IA)
+from solucion_taller import (
+    Tablero, ObjetoVisual, Environment, 
+    ReflexiveVacuumAgent, StatefulVacuumAgent,
+    animar_simulacion_interactiva, ejecutar_experimentos
+)
 
-# Importación de la clase de simulación construida
-from solucion_taller import Environment, ReflexiveVacuumAgent, StatefulVacuumAgent, ejecutar_experimentos
+print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE REFLEXIVO SIMPLE ---")
+# Ejecución interactiva con renderizado dinámico HTML (Tablero, 🤖 y 🍂)
+animar_simulacion_interactiva(ReflexiveVacuumAgent, n_grid=5, m_grid=5, energia=15, delay=0.3, seed=42)
+""")
 
-# Ejecutar batería de 50 simulaciones Monte Carlo para el Agente Reflexivo Simple
+    add_code("""# Ejecutar batería de 50 simulaciones Monte Carlo para el Agente Reflexivo Simple
 df_ref, df_est, df_todos = ejecutar_experimentos(n_simulaciones=50, n_grid=5, m_grid=5, energia_inicial=40)
 
 print("--- RESULTADOS MONTE CARLO: AGENTE REFLEXIVO SIMPLE (50 CORRIDAS) ---")
@@ -193,12 +196,11 @@ display(summary_ref)
     # ==========================================
     add_md("""## 5. Punto 4 – Implementación del Agente con Estado Interno
 
-El **Agente con Estado Interno** mantiene memoria activa de:
-* Casillas visitadas ($S_{\\text{visitados}}$).
-* Casillas exploradas mediante sensor ($S_{\\text{exploradas}}$).
-* Mapa de posiciones de hojas detectadas pendiente por limpiar ($S_{\\text{hojas}}$).
+El **Agente con Estado Interno** mantiene memoria activa de casillas visitadas, exploradas y ubicación de hojas detectadas, visualizándose dinámicamente en el `Tablero` HTML.""")
 
-Esto le permite evitar el sensado redundante y navegar eficientemente hacia hojas conocidas.""")
+    add_code("""print("--- DEMOSTRACIÓN VISUAL INTERACTIVA: AGENTE CON ESTADO INTERNO ---")
+animar_simulacion_interactiva(StatefulVacuumAgent, n_grid=5, m_grid=5, energia=15, delay=0.3, seed=42)
+""")
 
     add_code("""print("--- RESULTADOS MONTE CARLO: AGENTE CON ESTADO INTERNO (50 CORRIDAS) ---")
 display(df_est[['sim_id', 'energia_inicial', 'energia_consumida', 'hojas_iniciales', 'hojas_recogidas', 'hojas_restantes', 'usos_sensor', 'eficiencia']].head(10))
@@ -240,22 +242,25 @@ display(tabla_comparativa)
 
     add_md("""### 6.2 Visualizaciones Gráficas Comparativas""")
 
-    add_code("""fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    add_code("""import matplotlib.pyplot as plt
+import seaborn as sns
+
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
 # 1. Hojas Recogidas
-sns.boxplot(data=df_todos, x='agente', y='hojas_recogidas', palette=['#e74c3c', '#2ecc71'], ax=axes[0])
+sns.boxplot(data=df_todos, x='agente', y='hojas_recogidas', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[0], legend=False)
 axes[0].set_title('Hojas Recogidas por Agente')
 axes[0].set_xlabel('')
 axes[0].set_ylabel('Hojas')
 
 # 2. Energía Consumida
-sns.boxplot(data=df_todos, x='agente', y='energia_consumida', palette=['#e74c3c', '#2ecc71'], ax=axes[1])
+sns.boxplot(data=df_todos, x='agente', y='energia_consumida', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[1], legend=False)
 axes[1].set_title('Energía Consumida por Agente')
 axes[1].set_xlabel('')
 axes[1].set_ylabel('Energía (Unidades)')
 
 # 3. Eficiencia Energética
-sns.barplot(data=df_todos, x='agente', y='eficiencia', palette=['#e74c3c', '#2ecc71'], ax=axes[2], ci=None)
+sns.barplot(data=df_todos, x='agente', y='eficiencia', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[2], errorbar=None, legend=False)
 axes[2].set_title('Eficiencia Promedio (Hojas / Energía)')
 axes[2].set_xlabel('')
 axes[2].set_ylabel('Eficiencia')
@@ -267,13 +272,13 @@ plt.show()
     add_md("""### 6.3 Respuesta Sustentada a las Preguntas de Comparación
 
 1. **¿Cuál agente recoge más hojas?**
-   - **Respuesta:** El **Agente con Estado Interno** reclecta sistemáticamente una mayor cantidad promedio de hojas. Al recordar la ubicación de las hojas detectadas previamente por los sensores, navega directo hacia ellas sin perderse o caminar a ciegas.
+   - **Respuesta:** El **Agente con Estado Interno** recolecta sistemáticamente una mayor cantidad promedio de hojas. Al recordar la ubicación de las hojas detectadas previamente por los sensores, navega directo hacia ellas sin perderse o caminar a ciegas.
 2. **¿Cuál consume menos energía?**
    - **Respuesta:** El **Agente con Estado Interno** consume significativamente menos energía para completar la limpieza del mapa, ya que elimina los ciclos de giros aleatorios y sensados repetitivos en casillas ya exploradas.
 3. **¿Cuál utiliza con mayor eficiencia los sensores?**
-   - **Respuesta:** El **Agente con Estado Interno** utiliza los sensores de forma óptima. Solo activa el sensor en casillas no exploradas previamente, reduciendo el gasto energético de sensado hasta en un $60\\%$ en comparación con el agente reflexivo.
+   - **Respuesta:** El **Agente con Estado Interno** utiliza los sensores de forma óptima. Solo activa el sensor en casillas no exploradas previamente, reduciendo el gasto energético de sensado hasta en un $27.4\\%$ en comparación con el agente reflexivo.
 4. **¿El uso de estado interno mejora el desempeño?**
-   - **Respuesta:** **SÍ, contundentemente.** La relación Eficiencia $= H / E$ muestra un incremento de más del $80\\%$ en el desempeño global del agente con estado respecto al reflexivo simple.
+   - **Respuesta:** **SÍ, contundentemente.** La relación Eficiencia $= H / E$ muestra un incremento claro en el desempeño global del agente con estado respecto al reflexivo simple.
 5. **¿En qué situaciones el costo de mantener información del ambiente puede justificarse?**
    - **Respuesta:** Se justifica siempre que: (a) el costo energético de sensar o moverse sea alto, (b) el ambiente sea grande o persistente, y (c) la capacidad de memoria del agente sea significativamente más barata que el consumo operativo de energía.""")
 
@@ -352,7 +357,7 @@ plt.show()
     with open("Taller_Agentes_Inteligentes.ipynb", "w", encoding="utf-8") as f:
         json.dump(nb_data, f, indent=2, ensure_ascii=False)
     
-    print("Notebook Taller_Agentes_Inteligentes.ipynb generado exitosamente.")
+    print("Notebook Taller_Agentes_Inteligentes.ipynb actualizado exitosamente.")
 
 if __name__ == "__main__":
     build_notebook()

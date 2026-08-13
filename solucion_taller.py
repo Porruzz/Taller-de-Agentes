@@ -1,4 +1,5 @@
 import os
+import time
 import random
 import numpy as np
 import pandas as pd
@@ -6,13 +7,56 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from enum import Enum
 from typing import Tuple, List, Dict, Set, Optional
+from IPython.display import display
+import ipywidgets as widgets
 import mesa
 
-# Set seaborn style for high quality plots
+# Estilos de seaborn para gráficos estáticos
 sns.set_theme(style="darkgrid")
 plt.rcParams['font.size'] = 11
 
 os.makedirs("images", exist_ok=True)
+
+# ==========================================
+# CLASES DE VISUALIZACIÓN INTERACTIVA (TABLERO Y OBJETOS)
+# (Guía Notebook Robot_Aspiradora_IA)
+# ==========================================
+
+class Tablero:
+    def __init__(self, tamano_celda=(50, 50), n_celdas=(5, 5)):
+        self.out = widgets.HTML()
+        display(self.out)
+        self.tamano_celda = tamano_celda
+        self.n_celdas = n_celdas
+
+    def dibujar(self, objetos):
+        tablero = "<table border='1' style='border-collapse: collapse; text-align: center; margin: 10px 0;'>{}</table>"
+        filas = ""
+
+        for i in range(self.n_celdas[0]):
+            s = ""
+            for j in range(self.n_celdas[1]):
+                contenido = ""
+                for o in objetos:
+                    if o.x == j and o.y == i:
+                        contenido += \
+                        "<div style='display:inline-block; transform: rotate({angulo}deg); font-size:{tamano_emoticon}px; margin: 2px;'>{emoticon}</div>".\
+                        format(angulo=o.angulo, tamano_emoticon=o.tamano_emoticon, emoticon=o.emoticon)
+                s += "<td style='height:{alto}px; width:{ancho}px; vertical-align: middle;'>{contenido}</td>".\
+                    format(alto=self.tamano_celda[0], ancho=self.tamano_celda[1], contenido=contenido)
+            filas += "<tr>{}</tr>".format(s)
+        tablero = tablero.format(filas)
+        self.out.value = tablero
+
+
+class ObjetoVisual:
+    def __init__(self, x=0, y=0, angulo=0, emoticon="🤖", tamano_emoticon=30):
+        self.x = x
+        self.y = y
+        self.angulo = angulo
+        self.emoticon = emoticon
+        self.tamano_emoticon = tamano_emoticon
+
 
 # ==========================================
 # ESTRUCTURAS BÁSICAS Y CLASES DE SIMULACIÓN
@@ -252,6 +296,45 @@ class StatefulVacuumAgent(BaseAgent):
 
 
 # ==========================================
+# ANIMACIÓN INTERACTIVA EN JUPYTER / COLAB
+# ==========================================
+
+def animar_simulacion_interactiva(TipoAgente, n_grid=5, m_grid=5, energia=20, delay=0.5, seed=42):
+    """
+    Renderiza el tablero HTML dinámico en Jupyter utilizando widgets.HTML
+    con emoticons 🤖 para el agente y 🍂 para las hojas.
+    """
+    env = Environment(n_grid, m_grid, prob_hojas=0.5, seed=seed)
+    agente = TipoAgente(pos_inicial=(0, 0), energia=energia, orientacion_deg=0)
+    tablero = Tablero(tamano_celda=(50, 50), n_celdas=(n_grid, m_grid))
+
+    def construir_objetos_visuales():
+        objs = []
+        # Agente 🤖
+        objs.append(ObjetoVisual(x=agente.pos[0], y=agente.pos[1], angulo=agente.orientacion.value[2], emoticon="🤖", tamano_emoticon=28))
+        # Hojas 🍂
+        for i in range(env.n):
+            for j in range(env.m):
+                if env.grid[i, j] == 1:
+                    objs.append(ObjetoVisual(x=i, y=j, angulo=0, emoticon="🍂", tamano_emoticon=26))
+        return objs
+
+    tablero.dibujar(construir_objetos_visuales())
+    time.sleep(delay)
+
+    pasos = 0
+    while agente.energia > 0 and env.hojas_restantes() > 0 and pasos < 50:
+        actuado = agente.actuar(env)
+        tablero.dibujar(construir_objetos_visuales())
+        time.sleep(delay)
+        if not actuado:
+            break
+        pasos += 1
+
+    print(f"Simulación finalizada. Energía restante: {agente.energia}, Hojas recogidas: {agente.hojas_recogidas}/{env.hojas_iniciales}")
+
+
+# ==========================================
 # EXPERIMENTACIÓN MONTE CARLO (50 CORRIDAS)
 # ==========================================
 
@@ -403,19 +486,18 @@ def simular_propagacion_infeccion(pasos: int = 50):
 def generar_graficos_y_guardar():
     df_ref, df_est, df_todos = ejecutar_experimentos(n_simulaciones=50)
 
-    # 1. Grafico Comparativo de Agentes
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-    sns.boxplot(data=df_todos, x='agente', y='hojas_recogidas', palette=['#e74c3c', '#2ecc71'], ax=axes[0])
+    sns.boxplot(data=df_todos, x='agente', y='hojas_recogidas', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[0], legend=False)
     axes[0].set_title('Hojas Recogidas por Agente')
     axes[0].set_xlabel('')
     axes[0].set_ylabel('Hojas')
 
-    sns.boxplot(data=df_todos, x='agente', y='energia_consumida', palette=['#e74c3c', '#2ecc71'], ax=axes[1])
+    sns.boxplot(data=df_todos, x='agente', y='energia_consumida', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[1], legend=False)
     axes[1].set_title('Energía Consumida por Agente')
     axes[1].set_xlabel('')
     axes[1].set_ylabel('Energía (Unidades)')
 
-    sns.barplot(data=df_todos, x='agente', y='eficiencia', palette=['#e74c3c', '#2ecc71'], ax=axes[2], errorbar=None)
+    sns.barplot(data=df_todos, x='agente', y='eficiencia', hue='agente', palette=['#e74c3c', '#2ecc71'], ax=axes[2], errorbar=None, legend=False)
     axes[2].set_title('Eficiencia Promedio (Hojas / Energía)')
     axes[2].set_xlabel('')
     axes[2].set_ylabel('Eficiencia')
@@ -424,7 +506,6 @@ def generar_graficos_y_guardar():
     plt.savefig('images/comparativa_agentes.png', dpi=300)
     plt.close()
 
-    # 2. Grafico Epidemiologico Mesa
     df_base, df_est1, df_est2 = simular_propagacion_infeccion(pasos=50)
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
